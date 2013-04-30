@@ -1,9 +1,9 @@
-<?php
-
-/**
- * @package     web2project\theme
- */
-
-class w2p_Theme_Base {
-    
+<?php
+
+/**
+ * @package     web2project\theme
+ */
+
+class w2p_Theme_Base {
+    
 }

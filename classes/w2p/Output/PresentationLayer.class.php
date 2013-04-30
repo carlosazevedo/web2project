@@ -1,4 +1,202 @@
-class w2p_Presentation_Layer {
+<?php
+/**
+ * The Application Presentation Layer Class.
+ *
+ * @package     web2project\output
+ * @author      Carlos Azevedo
+ */
+
+class PL_Object {
+
+	public $html = null;
+	public $class = null;
+	public $id = null;
+	public $style = null;
+	public $extra = null;
+
+	protected $contains = null;
+
+	public function __construct($html)
+	{
+		$this->html = $html;
+	}
+
+	public function Render()
+	{
+		return $html;
+	}
+
+	public function addObjects($to_contain)
+	{
+		if (is_array($to_contain)) {
+			foreach ($to_contain as $child) {
+				if (!is_null($child)) {
+					$this->contains[] = $child;
+				}
+			}
+		} else if (!is_null($to_contain)) {
+			$this->contains[] = $to_contain;
+		}
+	}
+
+	public function appendValue($value, $name)
+	{
+		if (!is_null($value)) {
+			return $name . '="' . $value . '" ';
+		}
+		return '';
+	}
+
+}
+
+class PL_Container extends PL_Object {
+
+	public $width = null;
+	public $height = null;
+	public $cellspacing = 0;
+	public $cellpadding = 0;
+	public $border = 0;
+	
+
+	public function __construct($wdt, $hgt, $cspacing, $cpadding, $brd, $cls, $oid, $stl, $ext)
+	{
+		$this->width = $wdt;
+		$this->height = $hgt;
+		$this->cellspacing = $cspacing;
+		$this->cellpadding = $cpadding;
+		$this->border = $brd;
+		$this->class = $cls;
+		$this->id = $oid;
+		$this->style = $stl;
+		$this->extra = $ext;
+		$this->contains = array();
+	}
+
+	public function Render()
+	{
+		$html = '<table ' . $this->appendValue($this->width, 'width') . $this->appendValue($this->cellspacing, 'cellspacing') . 
+			 	    $this->appendValue($this->cellpadding, 'cellpadding') . $this->appendValue($this->border, 'border') .
+				    $this->appendValue($this->class, 'class') . $this->appendValue($this->id, 'id') .
+				    $this->appendValue($this->style, 'style') . ' ' . $this->extra . '>';
+		foreach ($this->contains as &$obj) {
+			$html .= $obj->Render();
+		}
+		$html .= '</table>';
+		return $html;
+	}
+
+}
+
+class PL_Row extends PL_Object {
+
+	public $width = null;
+	public $height = null;
+	
+
+	public function __construct($wdt, $hgt, $cls, $oid, $stl, $ext)
+	{
+		$this->width = $wdt;
+		$this->height = $hgt;
+		$this->class = $cls;
+		$this->id = $oid;
+		$this->style = $stl;
+		$this->extra = $ext;
+		$this->contains = array();
+	}
+
+	public function Render()
+	{
+		$html = '<tr ' . $this->appendValue($this->class, 'class') . $this->appendValue($this->id, 'id') .
+				 $this->appendValue($this->style, 'style') . ' ' . $this->extra . '>';
+		foreach ($this->contains as &$obj) {
+			$html .= $obj->Render();
+		}
+		$html .= '</tr>';
+		return $html;
+	}
+
+}
+
+class PL_Column extends PL_Object {
+
+	public $width = null;
+	public $height = null;
+	
+
+	public function __construct($wdt, $hgt, $cls, $oid, $stl, $ext)
+	{
+		$this->width = $wdt;
+		$this->height = $hgt;
+		$this->class = $cls;
+		$this->id = $oid;
+		$this->style = $stl;
+		$this->extra = $ext;
+		$this->contains = array();
+	}
+
+	public function Render()
+	{
+		$html = '<td ' . $this->appendValue($this->width, 'width') . $this->appendValue($this->class, 'class') . 
+				 $this->appendValue($this->id, 'id') . $this->appendValue($this->style, 'style') . 
+				 ' ' . $this->extra . '>';
+		if (count($this->contains)) {
+			foreach ($this->contains as &$obj) {
+				$html .= $obj->Render();
+			}
+		} else {
+			$html .= '&nbsp;';
+		}
+		$html .= '</td>';
+		return $html;
+	}
+
+}
+
+class PL_StaticImage extends PL_Object {
+
+	public $source = null;
+	public $width = null;
+	public $height = null;
+	public $alt_text = null;
+	public $border = null;
+	public $href = null;
+
+
+	public function __construct($src, $wdt, $hgt, $alt, $brd, $href, $cls, $oid, $stl, $ext)
+	{
+		$this->source = $src;
+		$this->width = $wdt;
+		$this->height = $hgt;
+		$this->alt_text = $alt;
+		$this->border = $brd;
+		$this->href = $href;
+		$this->class = $cls;
+		$this->id = $oid;
+		$this->style = $stl;
+		$this->extra = $ext;
+	}
+
+	public function Render()
+	{
+		$html = '';
+		if (!is_null($this->href)) {
+			$html .= '<a href="' . $this->href . '">';
+		}
+		$html .= '<img ' . $this->appendValue($this->border, 'border') . $this->appendValue($this->alt_text, 'alt') . 
+			 	   $this->appendValue($this->source, 'src') . $this->appendValue($this->class, 'class') . 
+				   $this->appendValue($this->id, 'id') . $this->appendValue($this->style, 'style') . 
+				   ' ' . $this->extra . '>';
+		if (!is_null($this->href)) {
+			$html .= '</a>';
+		}
+		return $html;
+	}
+
+}
+
+
+
+class w2p_Output_PresentationLayer {
 
 	public $user_timezone = null;
 	public $system_timezone = null;
@@ -21,7 +219,7 @@ class w2p_Presentation_Layer {
 
 	private $render_elements = null;
 
-	public function __construct(&$app_ui = null; $width = null, $user_tz = null, $style = null) 
+	public function __construct(&$app_ui = null, $width = null, $user_tz = null, $style = null) 
 	{
 		$system_timezone = w2PgetConfig('system_timezone', 'Europe/London');
 
@@ -50,6 +248,19 @@ class w2p_Presentation_Layer {
 		$render_elements = array();
 	}
 
+	public function addObjects($to_contain)
+	{
+		if (is_array($to_contain)) {
+			foreach ($to_contain as $child) {
+				if (!is_null($child)) {
+					$this->render_elements[] = $child;
+				}
+			}
+		} else if (!is_null($to_contain)) {
+			$this->render_elements[] = $to_contain;
+		}
+	}
+
 	public function setUIStyle($new_style)
 	{
 		// Get the style options array
@@ -61,7 +272,7 @@ class w2p_Presentation_Layer {
 		}
 	}
 
-	private funcion outputHead()
+	private function outputHead()
 	{
 		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
 		echo '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">';
@@ -73,35 +284,82 @@ class w2p_Presentation_Layer {
 		echo '<title>' . (is_null($this->dialog_title) ? @w2PgetConfig('page_title') : $this->dialog_title) . ' :: ' . $this->AppUI->_($this->module . $this->action) . '</title>';
 		if ($mobile_version && file_exists('./style/common_mobile.css')) {
 			echo '<link rel="stylesheet" type="text/css" href="./style/common_mobile.css" media="all" charset="utf-8"/>';
-		} else {
+		} else if (file_exists('./style/common.css')) {
 			echo '<link rel="stylesheet" type="text/css" href="./style/common.css" media="all" charset="utf-8"/>';
 		}
-		if ($mobile_version && file_exists('./style/' . $uistyle . '/common_mobile.css')) {
-			echo '<link rel="stylesheet" type="text/css" href="./style/' . $uistyle . '/common_mobile.css" media="all" charset="utf-8"/>';
-		} else {
-			echo '<link rel="stylesheet" type="text/css" href="./style/' . $uistyle . '/common.css" media="all" charset="utf-8"/>';
+		if ($mobile_version && file_exists('./style/' . $this->uistyle . '/common_mobile.css')) {
+			echo '<link rel="stylesheet" type="text/css" href="./style/' . $this->uistyle . '/common_mobile.css" media="all" charset="utf-8"/>';
+		} else if (file_exists('./style/' . $this->uistyle . '/common.css')) {
+			echo '<link rel="stylesheet" type="text/css" href="./style/' . $this->uistyle . '/common.css" media="all" charset="utf-8"/>';
 		}
 		if ($mobile_version && file_exists('./modules/' . $module . '/style_mobile.css')) {
 			echo '<link rel="stylesheet" type="text/css" href="./modules/' . $module . '/style_mobile.css" media="all" charset="utf-8"/>';
-		} else {
+		} else if (file_exists('./modules/' . $module . '/style.css')) {
 			echo '<link rel="stylesheet" type="text/css" href="./modules/' . $module . '/style.css" media="all" charset="utf-8"/>';
 		}
-		if ($mobile_version && file_exists('./style/' . $uistyle . '/' . $module . '/style_mobile.css')) {
-			echo '<link rel="stylesheet" type="text/css" href="./style/' . $uistyle . '/' . $module . '/style_mobile.css" media="all" charset="utf-8"/>';
-		} else {
-			echo '<link rel="stylesheet" type="text/css" href="./style/' . $uistyle . '/' . $module . '/style.css" media="all" charset="utf-8"/>';
+		if ($mobile_version && file_exists('./style/' . $this->uistyle . '/' . $module . '/style_mobile.css')) {
+			echo '<link rel="stylesheet" type="text/css" href="./style/' . $this->uistyle . '/' . $module . '/style_mobile.css" media="all" charset="utf-8"/>';
+		} else if (file_exists('./style/' . $this->uistyle . '/' . $module . '/style.css')) {
+			echo '<link rel="stylesheet" type="text/css" href="./style/' . $this->uistyle . '/' . $module . '/style.css" media="all" charset="utf-8"/>';
 		}
-		echo '<link rel="stylesheet" type="text/css" href="./js/common.js" media="all" charset="utf-8"/>';
-		echo '<link rel="stylesheet" type="text/css" href="./modules/' . $module . '/module.js" media="all" charset="utf-8"/>';
-		echo '<link rel="shortcut icon" href="./style/' . $uistyle . '/favicon.ico" type="image/ico" />';
+		if (file_exists('./js/common.js')) {
+			echo '<script type="text/javascript" src="./js/common.js" />';
+		}
+		if (file_exists('./modules/' . $module . '/module.js')) {
+			echo '<script type="text/javascript" src="./modules/' . $module . '/module.js" />';
+		}
+		if (file_exists('./style/' . $this->uistyle . '/favicon.ico')) {
+			echo '<link rel="shortcut icon" href="./style/' . $this->uistyle . '/favicon.ico" type="image/ico" />';
+		}
 		echo '</head>';
+	}
+
+	protected function outputNewPasswordForm()
+	{
+		$this->AppUI->setUserLocale();
+		@include_once W2P_BASE_DIR . '/locales/' . $this->AppUI->user_locale . '/locales.php';
+		include_once W2P_BASE_DIR . '/locales/core.php';
+		setlocale(LC_TIME, $this->AppUI->user_lang);
+		if (w2PgetParam($_POST, 'sendpass', 0)) {
+			sendNewPass();
+		} else {
+			require W2P_BASE_DIR . '/style/' . $this->uistyle . '/lostpass.php';
+		}
+	}
+
+	protected function outputLoginForm()
+	{
+		// Load basic locale settings
+		$this->AppUI->setUserLocale();
+		@include_once ('./locales/' . $this->AppUI->user_locale . '/locales.php');
+		include_once ('./locales/core.php');
+		setlocale(LC_TIME, $this->AppUI->user_lang);
+		$redirect = $_SERVER['QUERY_STRING'] ? strip_tags($_SERVER['QUERY_STRING']) : '';
+		if (strpos($redirect, 'logout') !== false) {
+			$redirect = '';
+		}
+
+		require W2P_BASE_DIR . '/style/' . $this->uistyle . '/login.php';
+		// Destroy the current session and output login page
+		session_unset();
+		session_destroy();
+	}
+
+	protected function outputErrorMessage()
+	{
+		echo '<div id="error-message" title="' . $this->AppUI->_('Error Message') . '">';
+		$err_msg = $this->AppUI->getMsg();
+		if ($err_msg != '') {
+			echo $err_msg;
+		}
+		echo '</div>';
 	}
 
 	protected function outputSiteID()
 	{
 		echo '<div class="siteid">';
 		echo '<a href="http://www.web2project.net/" target="_new" title="web2Project v. ' . $this->AppUI->getVersion() . $this->AppUI->_('click to visit web2Project site') . '">';
-		echo '<img src="style/' . $uistyle . '/images/title.jpg" border="0" class="banner" align="left" alt="' . $this->AppUI->_('click to visit web2Project site') . '" />';
+		echo '<img src="style/' . $this->uistyle . '/images/title.jpg" border="0" class="banner" align="left" alt="' . $this->AppUI->_('click to visit web2Project site') . '" />';
 		echo '</a>';
 		echo '</div>';
 	}
@@ -153,14 +411,19 @@ class w2p_Presentation_Layer {
 		}
 	}
 
-	protected function outputErrorMessage()
+	public function outputBody()
 	{
-		echo '<div id="error-message" title="' . $this->AppUI->_('Error Message') . '">';
-		$err_msg = $this->AppUI->getMsg();
-		if ($err_msg != '') {
-			echo $err_msg;
+		foreach ($this->render_elements as &$obj) {
+			echo $obj->Render();
 		}
-		echo '</div>';
+		unset($this->render_elements);
+		$this->render_elements = array();
+	}
+
+	public function HTML($html)
+	{
+		$obj = new PL_Object($html);
+		return $obj;
 	}
 
 	public function AnchorButton($text, $href, $class)
@@ -223,8 +486,10 @@ class w2p_Presentation_Layer {
 	{
 	}
 
-	public function ImageView()
+	public function StaticImageView($src, $width = null, $height = null, $alt = null, $border = 0, $href = null, $class = null, $id = null, $style = null, $extra = null)
 	{
+		$obj = new PL_StaticImage($src, $width, $heigth, $alt, $border, $href, $class, $id, $style, $extra);
+		return $obj;
 	}
 
 	public function LabelView()
@@ -271,12 +536,25 @@ class w2p_Presentation_Layer {
 	{
 	}
 
-	public function Column()
+	public function Container($to_contain, $width = null, $height = null, $cellspacing = 0, $cellpadding = 0, $border = 0, $class = null, $id = null, $style = null, $extra = null)
 	{
+		$obj = new PL_Container($width, $heigth, $cellspacing, $cellpadding, $border, $class, $id, $style, $extra);
+		$obj->addObjects($to_contain);
+		return $obj;
 	}
 
-	public function Row()
+	public function Column($to_contain, $width = null, $height = null, $class = null, $id = null, $style = null, $extra = null)
 	{
+		$obj = new PL_Column($width, $heigth, $class, $id, $style, $extra);
+		$obj->addObjects($to_contain);
+		return $obj;
+	}
+
+	public function Row($to_contain, $width = null, $height = null, $class = null, $id = null, $style = null, $extra = null)
+	{
+		$obj = new PL_Row($width, $heigth, $class, $id, $style, $extra);
+		$obj->addObjects($to_contain);
+		return $obj;
 	}
 
 	public function TitleBlock($title, $icon)
@@ -285,65 +563,6 @@ class w2p_Presentation_Layer {
 
 	public function ErrorBlock($type, $message)
 	{
-	}
-
-	public function outputBody()
-	{
-	}
-
-	public function outputNewPasswordForm()
-	{
-		$this->AppUI->setUserLocale();
-		@include_once W2P_BASE_DIR . '/locales/' . $this->AppUI->user_locale . '/locales.php';
-		include_once W2P_BASE_DIR . '/locales/core.php';
-		setlocale(LC_TIME, $this->AppUI->user_lang);
-		if (w2PgetParam($_POST, 'sendpass', 0)) {
-			sendNewPass();
-		} else {
-			require W2P_BASE_DIR . '/style/' . $this->uistyle . '/lostpass.php';
-		}
-	}
-
-	public function doLogin()
-	{
-		// Note the change to REQUEST instead of POST.  This is so that we can
-		// support alternative authentication methods such as the PostNuke
-		// and HTTP auth methods now supported.
-		$username = w2PgetCleanParam($_REQUEST, 'username', '');
-		$password = w2PgetCleanParam($_REQUEST, 'password', '');
-		$redirect = w2PgetCleanParam($_REQUEST, 'redirect', '');
-		$this->AppUI->setUserLocale();
-		@include_once (W2P_BASE_DIR . '/locales/' . $this->AppUI->user_locale . '/locales.php');
-		include_once W2P_BASE_DIR . '/locales/core.php';
-		$ok = $this->AppUI->login($username, $password);
-		if (!$ok) {
-			$this->AppUI->setMsg('Login Failed', UI_MSG_ERROR);
-		} else {
-			// Register login in user_acces_log
-			$this->AppUI->registerLogin();
-			// Store the user timezone
-			$this->user_timezone = $this->AppUI->getPref('TIMEZONE');
-		}
-		addHistory('login', $this->AppUI->user_id, 'login', $this->AppUI->user_first_name . ' ' . $this->AppUI->user_last_name . ' ' . $this->AppUI->_('logged in'));
-		$this->AppUI->redirect('' . $redirect);
-	}
-
-	public function outputLoginForm()
-	{
-		// Load basic locale settings
-		$this->AppUI->setUserLocale();
-		@include_once ('./locales/' . $this->AppUI->user_locale . '/locales.php');
-		include_once ('./locales/core.php');
-		setlocale(LC_TIME, $this->AppUI->user_lang);
-		$redirect = $_SERVER['QUERY_STRING'] ? strip_tags($_SERVER['QUERY_STRING']) : '';
-		if (strpos($redirect, 'logout') !== false) {
-			$redirect = '';
-		}
-
-		require W2P_BASE_DIR . '/style/' . $this->uistyle . '/login.php';
-		// Destroy the current session and output login page
-		session_unset();
-		session_destroy();
 	}
 
 	public function Render()
@@ -357,13 +576,24 @@ class w2p_Presentation_Layer {
 		}
 		// Check is the user needs a new password
 		if (w2PgetParam($_POST, 'lostpass', 0)) {
+			$this->outputHead();
+			echo '<body>';
+			echo '<div style="width: ' . $this->total_width . '; margin: 0 auto; overflow: hidden;">';
 			$this->outputNewPasswordForm();
-		// Check if the user is trying to log in.
-		} else if (isset($_POST['login'])) {
-			$this->doLogin();
+			$this->outputBody();
+			echo '</div>';
+			echo '</body>';
+			echo '</html>';
 		// Check if we are logged in
 		} else if ($this->AppUI->doLogin()) {
+			$this->outputHead();
+			echo '<body>';
+			echo '<div style="width: ' . $this->total_width . '; margin: 0 auto; overflow: hidden;">';
 			$this->outputLoginForm();
+			$this->outputBody();
+			echo '</div>';
+			echo '</body>';
+			echo '</html>';
 		} else {
 			if (!$this->output_gz) {
 				ob_start();
@@ -374,7 +604,7 @@ class w2p_Presentation_Layer {
 			}
 			$this->outputHead();
 			echo '<body>';
-			echo '<div style="width: ' . $$this->total_width . '; margin: 0 auto; overflow: hidden;">';
+			echo '<div style="width: ' . $this->total_width . '; margin: 0 auto; overflow: hidden;">';
 			$this->outputSiteID();
 			if (!$$this->is_dialog) {
 				$this->outputMenu();

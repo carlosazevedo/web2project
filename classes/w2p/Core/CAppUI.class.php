@@ -147,9 +147,9 @@ class w2p_Core_CAppUI
         $this->defaultRedirect = '';
         // set up the default preferences
         $this->setUserLocale($this->base_locale);
-        $this->user_prefs = array();
-	
-	$this->PL = new w2p_Presentation_Layer($this);
+        $this->user_prefs = array();	
+
+	$this->PL = new w2p_Output_PresentationLayer($this);
     }
 
     /**

@@ -57,11 +57,11 @@ require W2P_BASE_DIR . '/includes/ajax_functions.php';
                     }
                 ?>
 
-                <div class="header">
-                    <div class="left nav">
+                <table width="100%" cellpadding="0" cellspacing="0"><tr class="header">
+                    <td><div class="left nav">
                         <?php echo buildHeaderNavigation($AppUI, 'ul', 'li', '', $m); ?>
-                    </div>
-                    <div class="right" style="margin: 4px;">
+                    </div></td>
+                    <td style="margin: 4px; align: right;">
                         <?php
                         if ($AppUI->user_id > 0) {
                             //Do this check in case we are not using any user id, for example for external uses
@@ -79,9 +79,9 @@ require W2P_BASE_DIR . '/includes/ajax_functions.php';
                             echo arraySelect($newItem, 'm', 'style="font-size:10px" onchange="f=document.frm_new;mod=f.m.options[f.m.selectedIndex].value;if (mod == \'admin\') document.frm_new.a.value=\'addedituser\';if(mod) f.submit();"', '', true);
                         }
                         ?>
-                    </div>
-                </div>
-                <div class="std shadow">&nbsp;</div>
+                    </td>
+                </tr>
+                <tr class="shadow"><td colspan="2">&nbsp;</td></tr></table>
             </form>
             <div>
                 <div class="left" style="margin: 5px;">
@@ -102,16 +102,16 @@ require W2P_BASE_DIR . '/includes/ajax_functions.php';
                             </form>
                             <?php } ?>
                         </div>
-                        <a class="button" href="javascript: void(0);" onclick="javascript:window.open('?m=help&amp;dialog=1&amp;hid=', 'contexthelp', 'width=800, height=600, left=50, top=50, scrollbars=yes, resizable=yes')"><div><?php echo $AppUI->_('Help'); ?></div></a>
-                        <a class="button" href="./index.php?m=admin&amp;a=viewuser&amp;user_id=<?php echo $AppUI->user_id; ?>"><div><?php echo $AppUI->_('My Info'); ?></div></a>
+                        <a class="button" href="javascript: void(0);" onclick="javascript:window.open('?m=help&amp;dialog=1&amp;hid=', 'contexthelp', 'width=800, height=600, left=50, top=50, scrollbars=yes, resizable=yes')"><span><?php echo $AppUI->_('Help'); ?></span></a>
+                        <a class="button" href="./index.php?m=admin&amp;a=viewuser&amp;user_id=<?php echo $AppUI->user_id; ?>"><span><?php echo $AppUI->_('My Info'); ?></span></a>
                         <?php if (canAccess('tasks')) { ?>
-                            <a class="button" href="./index.php?m=tasks&amp;a=todo"><div><b><?php echo $AppUI->_('My Tasks'); ?></b></div></a>
+                            <a class="button" href="./index.php?m=tasks&amp;a=todo"><span><b><?php echo $AppUI->_('My Tasks'); ?></b></span></a>
                         <?php } ?>
                         <?php if (canAccess('calendar')) {
                             $now = new w2p_Utilities_Date(); ?>
-                            <a class="button" href="./index.php?m=calendar&amp;a=day_view&amp;date=<?php echo $now->format(FMT_TIMESTAMP_DATE); ?>"><div><?php echo $AppUI->_('Today'); ?></div></a>
+                            <a class="button" href="./index.php?m=calendar&amp;a=day_view&amp;date=<?php echo $now->format(FMT_TIMESTAMP_DATE); ?>"><span><?php echo $AppUI->_('Today'); ?></span></a>
                         <?php } ?>
-                        <a class="button" href="./index.php?logout=-1"><div><?php echo $AppUI->_('Logout'); ?></div></a>
+                        <a class="button" href="./index.php?logout=-1"><span><?php echo $AppUI->_('Logout'); ?></span></a>
                     </div>
                 <?php } ?>
             </div>

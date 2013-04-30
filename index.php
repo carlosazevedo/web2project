@@ -59,6 +59,7 @@ if (!isset($_SESSION['AppUI']) || isset($_GET['logout'])) {
 
 	$_SESSION['AppUI'] = new w2p_Core_CAppUI();
 }
+
 $AppUI = &$_SESSION['AppUI'];
 $last_insert_id = $AppUI->last_insert_id;
 
@@ -81,10 +82,44 @@ if (isset($user_id) && isset($_GET['logout'])) {
 $uistyle = $AppUI->getPref('UISTYLE') ? $AppUI->getPref('UISTYLE') : w2PgetConfig('host_style');
 $AppUI->PL->setUIStyle($uistyle);
 
+// check is the user needs a new password; shortcut the rest if so
+if (w2PgetParam($_POST, 'lostpass', 0)) {
+	$AppUI->PL->Render();
+	exit();
+}
+
+// check if the user is trying to log in
+// Note the change to REQUEST instead of POST.  This is so that we can
+// support alternative authentication methods such as the PostNuke
+// and HTTP auth methods now supported.
+if (isset($_POST['login'])) {
+	$username = w2PgetCleanParam($_REQUEST, 'username', '');
+	$password = w2PgetCleanParam($_REQUEST, 'password', '');
+	$redirect = w2PgetCleanParam($_REQUEST, 'redirect', '');
+	$AppUI->setUserLocale();
+	@include_once (W2P_BASE_DIR . '/locales/' . $AppUI->user_locale . '/locales.php');
+	include_once W2P_BASE_DIR . '/locales/core.php';
+	$ok = $AppUI->login($username, $password);
+	if (!$ok) {
+		$AppUI->setMsg('Login Failed', UI_MSG_ERROR);
+	} else {
+		//Register login in user_acces_log
+		$AppUI->registerLogin();
+	}
+	addHistory('login', $AppUI->user_id, 'login', $AppUI->user_first_name . ' ' . $AppUI->user_last_name . ' ' . $AppUI->_('logged in'));
+	$AppUI->redirect('' . $redirect);
+}
+
 // clear out main url parameters
 $m = '';
 $a = '';
 $u = '';
+
+// check if we are logged in
+if ($AppUI->doLogin()) {
+	$AppUI->PL->Render();
+	exit();
+}
 
 $AppUI->setUserLocale();
 
@@ -164,7 +199,7 @@ if (file_exists($module_file)) {
 	require $module_file;
 } else {
 	$AppUI->PL->ErrorBlock(UI_MSG_WARNING, 'Unknown module file');
-	error_log($AppUI->_('Missing module file' . ': ' . $m);
+	error_log($AppUI->_('Missing module file') . ': ' . $m);
 }
 
 $AppUI->PL->Render();

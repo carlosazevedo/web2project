@@ -78,13 +78,13 @@ div.titlebar {
     background: url(images/title_bkgd.jpg);
 }
 
-div.header {
+tr.header {
     background: url(images/nav_bkgd.gif);
     color:      #000;
     height:     24px;
 }
 
-div.shadow {
+tr.shadow {
     background: url(images/nav_shadow.jpg);
 }
 
