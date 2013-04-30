@@ -105,6 +105,8 @@ class w2p_Core_CAppUI
       @var string */
     public $user_style = null;
 
+    public $PL = null;
+
     /**
       @var integer */
     public $user_is_admin = null;
@@ -118,6 +120,7 @@ class w2p_Core_CAppUI
      * @var array
      */
     protected $footerJavascriptFiles = array();
+
 
     /**
 
@@ -145,6 +148,8 @@ class w2p_Core_CAppUI
         // set up the default preferences
         $this->setUserLocale($this->base_locale);
         $this->user_prefs = array();
+	
+	$this->PL = new w2p_Presentation_Layer($this);
     }
 
     /**
@@ -923,6 +928,7 @@ class w2p_Core_CAppUI
         if (canView('admin')) {
             $this->user_is_admin = 1;
         }
+
         return true;
     }
 

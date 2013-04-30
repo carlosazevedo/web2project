@@ -14,26 +14,6 @@ if (defined('E_DEPRECATED')) {
 }
 //error_reporting(-1);
 
-define('W2P_PERFORMANCE_DEBUG', false);
-define('MIN_PHP_VERSION', '5.2.0');
-//date_default_timezone_set('America/New_York');
-//Performance Debug Initialization
-if (W2P_PERFORMANCE_DEBUG) {
-    global $w2p_performance_time, $w2p_performance_dbtime,
-        $w2p_performance_old_dbqueries, $w2p_performance_dbqueries,
-        $w2p_performance_acltime, $w2p_performance_aclchecks,
-        $w2p_performance_memory_marker, $w2p_performance_setuptime;
-    $w2p_performance_time = array_sum(explode(' ', microtime()));
-    if (function_exists('memory_get_usage')) {
-        $w2p_performance_memory_marker = memory_get_usage();
-    }
-    $w2p_performance_acltime = 0;
-    $w2p_performance_aclchecks = 0;
-    $w2p_performance_dbtime = 0;
-    $w2p_performance_old_dbqueries = 0;
-    $w2p_performance_dbqueries = 0;
-}
-
 $baseDir = dirname(__file__);
 
 /*
