@@ -23,7 +23,7 @@ class PL_Object {
 
 	public function Render()
 	{
-		return $html;
+		return $this->html;
 	}
 
 	public function addObjects($to_contain)
@@ -78,8 +78,10 @@ class PL_Container extends PL_Object {
 			 	    $this->appendValue($this->cellpadding, 'cellpadding') . $this->appendValue($this->border, 'border') .
 				    $this->appendValue($this->class, 'class') . $this->appendValue($this->id, 'id') .
 				    $this->appendValue($this->style, 'style') . ' ' . $this->extra . '>';
-		foreach ($this->contains as &$obj) {
-			$html .= $obj->Render();
+		if (is_array($this->contains)) {
+			foreach ($this->contains as &$obj) {
+				$html .= $obj->Render();
+			}
 		}
 		$html .= '</table>';
 		return $html;
@@ -91,12 +93,14 @@ class PL_Row extends PL_Object {
 
 	public $width = null;
 	public $height = null;
+	public $rowspan = null;
 	
 
-	public function __construct($wdt, $hgt, $cls, $oid, $stl, $ext)
+	public function __construct($wdt, $hgt, $rs, $cls, $oid, $stl, $ext)
 	{
 		$this->width = $wdt;
 		$this->height = $hgt;
+		$this->rowspan = $rs;
 		$this->class = $cls;
 		$this->id = $oid;
 		$this->style = $stl;
@@ -106,10 +110,13 @@ class PL_Row extends PL_Object {
 
 	public function Render()
 	{
-		$html = '<tr ' . $this->appendValue($this->class, 'class') . $this->appendValue($this->id, 'id') .
-				 $this->appendValue($this->style, 'style') . ' ' . $this->extra . '>';
-		foreach ($this->contains as &$obj) {
-			$html .= $obj->Render();
+		$html = '<tr ' . $this->appendValue($this->rowspan, 'rowspan') . $this->appendValue($this->class, 'class') . 
+				 $this->appendValue($this->id, 'id') . $this->appendValue($this->style, 'style') . 
+				 ' ' . $this->extra . '>';
+		if (is_array($this->contains)) {
+			foreach ($this->contains as &$obj) {
+				$html .= $obj->Render();
+			}
 		}
 		$html .= '</tr>';
 		return $html;
@@ -121,12 +128,14 @@ class PL_Column extends PL_Object {
 
 	public $width = null;
 	public $height = null;
+	public $colspan = null;
 	
 
-	public function __construct($wdt, $hgt, $cls, $oid, $stl, $ext)
+	public function __construct($wdt, $hgt, $cs, $cls, $oid, $stl, $ext)
 	{
 		$this->width = $wdt;
 		$this->height = $hgt;
+		$this->colspan = $cs;
 		$this->class = $cls;
 		$this->id = $oid;
 		$this->style = $stl;
@@ -136,10 +145,10 @@ class PL_Column extends PL_Object {
 
 	public function Render()
 	{
-		$html = '<td ' . $this->appendValue($this->width, 'width') . $this->appendValue($this->class, 'class') . 
-				 $this->appendValue($this->id, 'id') . $this->appendValue($this->style, 'style') . 
-				 ' ' . $this->extra . '>';
-		if (count($this->contains)) {
+		$html = '<td ' . $this->appendValue($this->width, 'width') . $this->appendValue($this->colspan, 'colspan') . 
+				 $this->appendValue($this->class, 'class') . $this->appendValue($this->id, 'id') . 
+				 $this->appendValue($this->style, 'style') . ' ' . $this->extra . '>';
+		if (is_array($this->contains)) {
 			foreach ($this->contains as &$obj) {
 				$html .= $obj->Render();
 			}
@@ -147,6 +156,43 @@ class PL_Column extends PL_Object {
 			$html .= '&nbsp;';
 		}
 		$html .= '</td>';
+		return $html;
+	}
+
+}
+
+class PL_Header extends PL_Object {
+
+	public $width = null;
+	public $height = null;
+	public $colspan = null;
+	
+
+	public function __construct($wdt, $hgt, $cs, $cls, $oid, $stl, $ext)
+	{
+		$this->width = $wdt;
+		$this->height = $hgt;
+		$this->colspan = $cs;
+		$this->class = $cls;
+		$this->id = $oid;
+		$this->style = $stl;
+		$this->extra = $ext;
+		$this->contains = array();
+	}
+
+	public function Render()
+	{
+		$html = '<th ' . $this->appendValue($this->width, 'width') . $this->appendValue($this->colspan, 'colspan') . 
+				 $this->appendValue($this->class, 'class') . $this->appendValue($this->id, 'id') . 
+				 $this->appendValue($this->style, 'style') . ' ' . $this->extra . '>';
+		if (is_array($this->contains)) {
+			foreach ($this->contains as &$obj) {
+				$html .= $obj->Render();
+			}
+		} else {
+			$html .= '&nbsp;';
+		}
+		$html .= '</th>';
 		return $html;
 	}
 
@@ -194,6 +240,166 @@ class PL_StaticImage extends PL_Object {
 
 }
 
+class PL_Label extends PL_Object {
+
+	public $text = null;
+	public $relates_to = null;
+
+	public function __construct($txt, $r_t, $cls, $oid, $stl, $ext)
+	{
+		$this->text = $txt;
+		$this->relates_to = $r_t;
+		$this->class = $cls;
+		$this->id = $oid;
+		$this->style = $stl;
+		$this->extra = $ext;
+	}
+
+	public function Render()
+	{
+		if (isset($this->relates_to)) {
+			$html = '<label for="' . $this->relates_to . '" '. $this->appendValue($this->class, 'class') . 
+				 $this->appendValue($this->id, 'id') . $this->appendValue($this->style, 'style') . 
+				 ' ' . $this->extra . '>';
+		} else {
+			$html = '<span '. $this->appendValue($this->class, 'class') . $this->appendValue($this->id, 'id') . 
+				 $this->appendValue($this->style, 'style') . ' ' . $this->extra . '>';
+		}
+		$html .= ($this->text . ':');
+		if (isset($this->relates_to)) {
+			$html .= '</label>';
+		} else {
+			$html .= '</span>';
+		}
+		return $html;
+	}
+
+}
+
+class PL_LineEdit extends PL_Object {
+
+	public $type = 'text';
+	public $name = null;
+	public $size = null;
+	public $maxlength = null;
+	public $readonly = null;
+
+	public function __construct($ty, $nm, $sz, $ml, $ro, $cls, $oid, $stl, $ext)
+	{
+		$this->type = $ty;
+		$this->name = $nm;
+		$this->size = $sz;
+		$this->maxlength = $ml;
+		$this->readonly = $ro;
+		$this->class = $cls;
+		$this->id = $oid;
+		$this->style = $stl;
+		$this->extra = $ext;
+	}
+
+	public function Render()
+	{
+		$html = '<input type="' . $this->type . '" name="' . $this->name . '" ' . $this->appendValue($this->size, 'size') .
+			 $this->appendValue($this->maxlength, 'maxlength') . ($this->readonly ? 'readonly="readonly" ' : '') .
+			 $this->appendValue($this->class, 'class') . $this->appendValue($this->id, 'id') .
+			 $this->appendValue($this->style, 'style') . ' ' . $this->extra . '>';
+		return $html;
+	}
+
+}
+
+class PL_Button extends PL_Object {
+
+	public $type = 'submit';
+	public $name = null;
+	public $value = null;
+
+	public function __construct($ty, $nm, $vl, $cls, $oid, $stl, $ext)
+	{
+		$this->type = $ty;
+		$this->name = $nm;
+		$this->value = $vl;
+		$this->class = $cls;
+		$this->id = $oid;
+		$this->style = $stl;
+		$this->extra = $ext;
+	}
+
+	public function Render()
+	{
+		$html = '<input type="' . $this->type . '" name="' . $this->name . '" ' . $this->appendValue($this->value, 'value') .
+			 $this->appendValue($this->class, 'class') . $this->appendValue($this->id, 'id') .
+			 $this->appendValue($this->style, 'style') . ' ' . $this->extra . '>';
+		return $html;
+	}
+
+}
+
+class PL_Anchor extends PL_Object {
+
+	public $text = null;
+	public $href = null;
+	public $onclick = null;
+
+	public function __construct($txt, $hr, $oc, $cls, $oid, $stl, $ext)
+	{
+		$this->text = $txt;
+		$this->href = $hr;
+		$this->onclick = $oc;
+		$this->class = $cls;
+		$this->id = $oid;
+		$this->style = $stl;
+		$this->extra = $ext;
+	}
+
+	public function Render()
+	{
+		$html = '<a href="' . (isset($this->href) ? $this->href : 'javascript: void(0);') .'" ' . 
+			 $this->appendValue($this->onclick, 'onclick') . $this->appendValue($this->class, 'class') . 
+			 $this->appendValue($this->id, 'id') . $this->appendValue($this->style, 'style') . ' ' . $this->extra . '>' .
+			 $this->text . '</a>';
+		return $html;
+	}
+
+}
+
+class PL_Form extends PL_Object {
+
+	public $method = null;
+	public $action = null;
+	public $name = null;
+	public $hidden_fields_names = null;
+	public $hidden_fields_values = null;
+
+
+	public function __construct($meth, $act, $nm, $hfn, $hfv)
+	{
+		$this->method = $meth;
+		$this->action = $act;
+		$this->name = $nm;
+		$this->hidden_fields_names = $hfn;
+		$this->hidden_fields_values = $hfv;
+	}
+
+	public function Render()
+	{
+		$html = '<form method="' . $this->method . '" action="' . $this->action . '" name="' . $this->name . '" accept-charset="utf-8">';
+		if (is_array($this->hidden_fields_names)) {
+			foreach ($this->hidden_fields_names as $i => $name) {
+				$html .= '<input type="hidden" name="' . $name . '" value="' . $this->hidden_fields_values[$i] . '" />';
+			}
+		}
+		if (is_array($this->contains)) {
+			foreach ($this->contains as &$obj) {
+				$html .= $obj->Render();
+			}
+		}
+		$html .= '</form>';
+		return $html;
+	}
+
+}
+
 
 
 class w2p_Output_PresentationLayer {
@@ -213,6 +419,7 @@ class w2p_Output_PresentationLayer {
 	public $uistyle = 'web2project';
 	public $dialog_title = null;
 	public $is_dialog = false;
+	public $on_body_load = null;
 
 	public $mobile_version = false;
 	public $output_gz = true;
@@ -287,20 +494,20 @@ class w2p_Output_PresentationLayer {
 		} else if (file_exists('./style/common.css')) {
 			echo '<link rel="stylesheet" type="text/css" href="./style/common.css" media="all" charset="utf-8"/>';
 		}
-		if ($mobile_version && file_exists('./style/' . $this->uistyle . '/common_mobile.css')) {
-			echo '<link rel="stylesheet" type="text/css" href="./style/' . $this->uistyle . '/common_mobile.css" media="all" charset="utf-8"/>';
-		} else if (file_exists('./style/' . $this->uistyle . '/common.css')) {
-			echo '<link rel="stylesheet" type="text/css" href="./style/' . $this->uistyle . '/common.css" media="all" charset="utf-8"/>';
+		if ($mobile_version && file_exists('./style/' . $this->uistyle . '/style_common_mobile.css')) {
+			echo '<link rel="stylesheet" type="text/css" href="./style/' . $this->uistyle . '/style_common_mobile.css" media="all" charset="utf-8"/>';
+		} else if (file_exists('./style/' . $this->uistyle . '/style_common.css')) {
+			echo '<link rel="stylesheet" type="text/css" href="./style/' . $this->uistyle . '/style_common.css" media="all" charset="utf-8"/>';
 		}
-		if ($mobile_version && file_exists('./modules/' . $module . '/style_mobile.css')) {
-			echo '<link rel="stylesheet" type="text/css" href="./modules/' . $module . '/style_mobile.css" media="all" charset="utf-8"/>';
-		} else if (file_exists('./modules/' . $module . '/style.css')) {
-			echo '<link rel="stylesheet" type="text/css" href="./modules/' . $module . '/style.css" media="all" charset="utf-8"/>';
+		if ($mobile_version && file_exists('./modules/' . $module . '/module_mobile.css')) {
+			echo '<link rel="stylesheet" type="text/css" href="./modules/' . $module . '/module_mobile.css" media="all" charset="utf-8"/>';
+		} else if (file_exists('./modules/' . $module . '/module.css')) {
+			echo '<link rel="stylesheet" type="text/css" href="./modules/' . $module . '/module.css" media="all" charset="utf-8"/>';
 		}
-		if ($mobile_version && file_exists('./style/' . $this->uistyle . '/' . $module . '/style_mobile.css')) {
-			echo '<link rel="stylesheet" type="text/css" href="./style/' . $this->uistyle . '/' . $module . '/style_mobile.css" media="all" charset="utf-8"/>';
-		} else if (file_exists('./style/' . $this->uistyle . '/' . $module . '/style.css')) {
-			echo '<link rel="stylesheet" type="text/css" href="./style/' . $this->uistyle . '/' . $module . '/style.css" media="all" charset="utf-8"/>';
+		if ($mobile_version && file_exists('./style/' . $this->uistyle . '/' . $module . '/style_module_mobile.css')) {
+			echo '<link rel="stylesheet" type="text/css" href="./style/' . $this->uistyle . '/' . $module . '/style_module_mobile.css" media="all" charset="utf-8"/>';
+		} else if (file_exists('./style/' . $this->uistyle . '/' . $module . '/style_module.css')) {
+			echo '<link rel="stylesheet" type="text/css" href="./style/' . $this->uistyle . '/' . $module . '/style_module.css" media="all" charset="utf-8"/>';
 		}
 		if (file_exists('./js/common.js')) {
 			echo '<script type="text/javascript" src="./js/common.js" />';
@@ -312,6 +519,21 @@ class w2p_Output_PresentationLayer {
 			echo '<link rel="shortcut icon" href="./style/' . $this->uistyle . '/favicon.ico" type="image/ico" />';
 		}
 		echo '</head>';
+	}
+
+	protected function outputBody()
+	{
+		echo '<body' . (isset($this->on_body_load) ? ' onload="' . $this->on_body_load . '"' : '') . '>';
+		unset($this->on_body_load);
+	}
+
+	protected function outputIncludes()
+	{
+		if ($mobile_version && file_exists('./style/' . $this->uistyle . '/override_mobile.php')) {
+			include_once ('./style/' . $this->uistyle . '/override_mobile.php');
+		} else if (file_exists('./style/' . $this->uistyle . '/override.php')) {
+			include_once ('./style/' . $this->uistyle . '/override.php');
+		}
 	}
 
 	protected function outputNewPasswordForm()
@@ -392,7 +614,7 @@ class w2p_Output_PresentationLayer {
 		echo '</div>';
 		if ($this->AppUI->user_id > 0) {
 			echo '<div class="quick_buttons">';
-			$help_page = $this->AppUI->help_pages[$module];
+			$help_page = $this->AppUI->helpPages($module);
 			echo '<div class="help">';
 			echo $this->AnchorButton('Help', $help_page, 'help');
 			echo '</div>';
@@ -411,18 +633,32 @@ class w2p_Output_PresentationLayer {
 		}
 	}
 
-	public function outputBody()
+	public function outputHTML()
 	{
-		foreach ($this->render_elements as &$obj) {
-			echo $obj->Render();
+		if (count($this->render_elements)) {
+			foreach ($this->render_elements as &$obj) {
+				echo $obj->Render();
+			}
+			unset($this->render_elements);
+			$this->render_elements = array();
 		}
-		unset($this->render_elements);
-		$this->render_elements = array();
 	}
 
 	public function HTML($html)
 	{
 		$obj = new PL_Object($html);
+		return $obj;
+	}
+
+	public function Label($text, $relates_to = null, $translate = true, $class = null, $id = null, $style = null, $extra = null)
+	{
+		$obj = new PL_Label($translate ? $this->AppUI->_($text) : $text, $relates_to, $class, $id, $style, $extra);
+		return $obj;
+	}
+
+	public function Anchor($text, $href = null, $onclick = null, $class = null, $id = null, $style = null, $extra = null)
+	{
+		$obj = new PL_Anchor($this->AppUI->_($text), $href, $onclick, $class, $id, $style, $extra);
 		return $obj;
 	}
 
@@ -438,8 +674,13 @@ class w2p_Output_PresentationLayer {
 	{
 	}
 
-	public function LineEdit()
+	public function LineEdit($type, $name, $size = null, $maxlength = null, $readonly = false, $class = null, $id = null, $style = null, $extra = null)
 	{
+		$text = strtolower($text);
+		if (in_array($type, array('email', 'password', 'text', 'url'))) {
+			$obj = new PL_LineEdit($type, $name, $size, $maxlength, $readonly, $class, $id, $style, $extra);
+			return $obj;
+		}
 	}
 
 	public function TextEdit()
@@ -462,8 +703,13 @@ class w2p_Output_PresentationLayer {
 	{
 	}
 
-	public function Button()
+	public function Button($type, $name, $value, $class = null, $id = null, $style = null, $extra = null)
 	{
+		$text = strtolower($text);
+		if (in_array($type, array('button', 'file', 'reset', 'submit'))) {
+			$obj = new PL_Button($type, $name, $value, $class, $id, $style, $extra);
+			return $obj;
+		}
 	}
 
 	public function CheckButton()
@@ -488,12 +734,11 @@ class w2p_Output_PresentationLayer {
 
 	public function StaticImageView($src, $width = null, $height = null, $alt = null, $border = 0, $href = null, $class = null, $id = null, $style = null, $extra = null)
 	{
+		if (isset($alt)) {
+			$alt = $this->AppUI->_($alt);
+		}
 		$obj = new PL_StaticImage($src, $width, $heigth, $alt, $border, $href, $class, $id, $style, $extra);
 		return $obj;
-	}
-
-	public function LabelView()
-	{
 	}
 
 	public function NumberView()
@@ -528,6 +773,13 @@ class w2p_Output_PresentationLayer {
 	{
 	}
 
+	public function LabeledInput($label, $labelspan, $type, $editspan, $name, $size, $maxlength, $class = null, $id = null, $style = null, $extra = null)
+	{
+		$left = $this->Column($this->Label($label, $name, true, $class), null, null, $labelspan, 'labeled_input_label');
+		$right = $this->Column($this->LineEdit($type, $name, $size, $maxlength, false, $class, $id, $style, $extra), null, null, $editspan, 'labeled_input_edit');
+		return array($left, $right);
+	}
+
 	public function LabeledBlock()
 	{
 	}
@@ -536,23 +788,53 @@ class w2p_Output_PresentationLayer {
 	{
 	}
 
-	public function Container($to_contain, $width = null, $height = null, $cellspacing = 0, $cellpadding = 0, $border = 0, $class = null, $id = null, $style = null, $extra = null)
+	public function DialogBlock($to_contain, $width = null, $heigth = null, $class = null, $id = null, $style = null, $extra = null)
+	{
+		$cont = new PL_Container($width, $heigth, 0, 0, 0, $class, $id, $style, $extra);
+		$top_side = $this->Row($this->Column($this->Container($this->Row(array(
+								$this->Column($this->StaticImageView('./style/' . $this->uistyle . '/images/box_top_left.jpg', 19, 17), null, null, null, 'dialog_top', null, 'background:url(./style/' . $this->uistyle . '/images/box_top_left.jpg) no-repeat;'),
+								$this->Column($this->StaticImageView('./style/' . $this->uistyle . '/images/box_top.jpg', 19, 17), '100%', null, null, 'dialog_top', null, 'background:url(./style/' . $this->uistyle . '/images/box_top.jpg);'),
+								$this->Column($this->StaticImageView('./style/' . $this->uistyle . '/images/box_top_right.jpg', 19, 17), null, null, null, 'dialog_top', null, 'background:url(./style/' . $this->uistyle . '/images/box_top_right.jpg) no-repeat;'),
+							     )), '100%'), null, null, 2));
+		$cont->addObjects($top_side);
+		if (is_array($to_contain)) {
+			foreach ($to_contain as &$obj) {
+				$cont->addObjects($this->Row($obj));
+			}
+		}
+		$bottom_side = $this->Row($this->Column($this->Container($this->Row(array(
+								$this->Column($this->StaticImageView('./style/' . $this->uistyle . '/images/box_bottom_left.jpg', 19, 35), null, null, null, 'dialog_bottom', null, 'background:url(./style/' . $this->uistyle . '/images/box_bottom_left.jpg) no-repeat;'),
+								$this->Column($this->StaticImageView('./style/' . $this->uistyle . '/images/box_bottom.jpg', 19, 35), '100%', null, null, 'dialog_bottom', null, 'background:url(./style/' . $this->uistyle . '/images/box_bottom.jpg);'),
+								$this->Column($this->StaticImageView('./style/' . $this->uistyle . '/images/box_bottom_right.jpg', 19, 35), null, null, null, 'dialog_bottom', null, 'background:url(./style/' . $this->uistyle . '/images/box_bottom_right.jpg) no-repeat;'),
+							     )), '100%'), null, null, 2));
+		$cont->addObjects($bottom_side);
+		return $cont;
+	}
+
+	public function Container($to_contain, $width = null, $height = null, $cellspacing = 0, $cellpadding = 0, $border = null, $class = null, $id = null, $style = null, $extra = null)
 	{
 		$obj = new PL_Container($width, $heigth, $cellspacing, $cellpadding, $border, $class, $id, $style, $extra);
 		$obj->addObjects($to_contain);
 		return $obj;
 	}
 
-	public function Column($to_contain, $width = null, $height = null, $class = null, $id = null, $style = null, $extra = null)
+	public function Column($to_contain, $width = null, $height = null, $colspan = null, $class = null, $id = null, $style = null, $extra = null)
 	{
-		$obj = new PL_Column($width, $heigth, $class, $id, $style, $extra);
+		$obj = new PL_Column($width, $heigth, $colspan, $class, $id, $style, $extra);
 		$obj->addObjects($to_contain);
 		return $obj;
 	}
 
-	public function Row($to_contain, $width = null, $height = null, $class = null, $id = null, $style = null, $extra = null)
+	public function Header($to_contain, $width = null, $height = null, $colspan = null, $class = null, $id = null, $style = null, $extra = null)
 	{
-		$obj = new PL_Row($width, $heigth, $class, $id, $style, $extra);
+		$obj = new PL_Header($width, $heigth, $colspan, $class, $id, $style, $extra);
+		$obj->addObjects($to_contain);
+		return $obj;
+	}
+
+	public function Row($to_contain, $width = null, $height = null, $rowspan = null, $class = null, $id = null, $style = null, $extra = null)
+	{
+		$obj = new PL_Row($width, $heigth, $rowspan, $class, $id, $style, $extra);
 		$obj->addObjects($to_contain);
 		return $obj;
 	}
@@ -563,6 +845,13 @@ class w2p_Output_PresentationLayer {
 
 	public function ErrorBlock($type, $message)
 	{
+	}
+
+	public function Form($to_contain, $method, $action, $name, $hidden_fields_names = null, $hidden_fields_values = null)
+	{
+		$obj = new PL_Form($method, $action, $name, $hidden_fields_names, $hidden_fields_values);
+		$obj->addObjects($to_contain);
+		return $obj;
 	}
 
 	public function Render()
@@ -576,21 +865,23 @@ class w2p_Output_PresentationLayer {
 		}
 		// Check is the user needs a new password
 		if (w2PgetParam($_POST, 'lostpass', 0)) {
-			$this->outputHead();
-			echo '<body>';
-			echo '<div style="width: ' . $this->total_width . '; margin: 0 auto; overflow: hidden;">';
 			$this->outputNewPasswordForm();
+			$this->outputHead();
 			$this->outputBody();
+			$this->outputIncludes();
+			echo '<div style="width: ' . $this->total_width . '; margin: 0 auto; overflow: hidden;">';
+			$this->outputHTML();
 			echo '</div>';
 			echo '</body>';
 			echo '</html>';
 		// Check if we are logged in
 		} else if ($this->AppUI->doLogin()) {
-			$this->outputHead();
-			echo '<body>';
-			echo '<div style="width: ' . $this->total_width . '; margin: 0 auto; overflow: hidden;">';
 			$this->outputLoginForm();
+			$this->outputHead();
 			$this->outputBody();
+			$this->outputIncludes();
+			echo '<div style="width: ' . $this->total_width . '; margin: 0 auto; overflow: hidden;">';
+			$this->outputHTML();
 			echo '</div>';
 			echo '</body>';
 			echo '</html>';
@@ -603,15 +894,16 @@ class w2p_Output_PresentationLayer {
 				}
 			}
 			$this->outputHead();
-			echo '<body>';
+			$this->outputBody();
+			$this->outputIncludes();
 			echo '<div style="width: ' . $this->total_width . '; margin: 0 auto; overflow: hidden;">';
 			$this->outputSiteID();
-			if (!$$this->is_dialog) {
+			if (!$this->is_dialog) {
 				$this->outputMenu();
 				$this->outputQuickButtons();
 				$this->outputErrorMessage();
 			}
-			$this->outputBody();
+			$this->outputHTML();
 			echo '</div>';
 			echo '</body>';
 			echo '</html>';

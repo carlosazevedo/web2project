@@ -1,5 +1,103 @@
 /* $Id$ $URL$ */
 /* WEB2PROJECT REQUIRED CLASSES */
+
+td.dialog_top {
+	vertical-align: bottom;
+	height: 17px;
+}
+
+td.dialog_bottom {
+	vertical-align: top;
+	height: 35px;
+}
+
+input.text {
+	border: 1px #acacac solid;
+	font-family: arial,Osaka,verdana,Sans-Serif;
+	font-size: 8pt;
+	margin-top  : 2px;
+	-moz-border-radius:4px;
+	-webkit-border-radius:4px;
+	border-radius:4px;
+}
+
+td.labeled_input_label {
+	text-align: right;
+	padding: 4px;
+	white-space: nowrap;
+}
+
+td.labeled_input_edit {
+	text-align: right;
+	padding: 4px;
+	white-space: nowrap;
+}
+
+/* a 'standard' table */
+table.std { 
+	background: #fafafa; 
+	border-color: #acacac; 
+	border-style: solid; 
+	border-width: 1px 2px 2px 1px; 
+	-moz-border-radius:3px; 
+	-webkit-border-radius:3px;
+	border-radius:3px;
+}
+
+table.std th {	
+	background-color:#FFFFFF;
+	background-image:url(images/label.gif);
+	font: bold 12px Arial, Helvetica, sans-serif;
+	text-align: center;
+	color: #000;
+	margin-bottom: 0;
+	padding: 1px;
+	list-style-type: disc;
+	list-style-position: inside;
+}
+
+table.std td.hilite {
+	background-color: #E8F3FE;
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+}
+
+table.login {
+	border: 0;
+	margin-left:auto;
+	margin-right:auto;
+	width: 250px;
+}
+
+td.login_line_left {
+	padding: 6px;
+	white-space: nowrap;
+	text-align: left;
+}
+
+td.login_line_right {
+	padding: 6px;
+	white-space: nowrap;
+	text-align: right;
+}
+
+td.login_line_center {
+	padding: 6px;
+	white-space: nowrap;
+	text-align: center;
+}
+
+table.login td.labeled_input_label {
+	padding: 6px;
+}
+
+table.login td.labeled_input_edit {
+	padding: 6px;
+}
+
+
+
 BODY {
     background-color: #70a5cc;
     margin-top: 0px;
@@ -124,15 +222,6 @@ input.button:active {
     outline: none; /* hide dotted outline in Firefox */
 }
 
-.text{
-    border: 1px #acacac solid;
-    font-family: arial,Osaka,verdana,Sans-Serif;
-    font-size: 8pt;
-    margin-top  : 2px;
-    -moz-border-radius:4px;
-    -webkit-border-radius:4px;
-    border-radius:4px;
-}
 .text textarea:focus, input[type="text"]:focus, select:focus{
     border: 1px #acacac solid;
     background-color:#ffe;
@@ -248,38 +337,8 @@ table {
     border-color: #acacac;
 }
 
-/* a 'standard' table */
-table.std { 
-	background: #fafafa; 
-	border-color: #acacac; 
-	border-style: solid; 
-	border-width: 1px 2px 2px 1px; 
-	-moz-border-radius:3px; 
-    -webkit-border-radius:3px;
-    border-radius:3px;
-}
-
-table.std TH {	
-	background-color:#FFFFFF;
-	background-image:url(images/label.gif);
-	font: bold 12px Arial, Helvetica, sans-serif;
-	text-align: center;
-    color: #000;
-	margin-bottom: 0;
-	padding: 1px;
-	list-style-type: disc;
-	list-style-position: inside;
-}
-
 table.addedit.pref td {
     width: 50%;
-}
-
-table.std td.hilite {
-    background-color: #E8F3FE;
-    -moz-border-radius:3px;
-    -webkit-border-radius:3px;
-    border-radius:3px;
 }
 
 /* contacts table */
